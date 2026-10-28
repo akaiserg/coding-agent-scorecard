@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# macOS
+.DS_Store
+
+# Local Claude Code settings
+.claude/settings.local.json
+.claude/*.lock
+
+# Downloaded and derived data, rebuilt by scripts/run.sh. data/raw/ alone is ~190 MB and holds
+# other people's issue and PR text, so none of it is committed.
+data/
+
+# Generated pages and images. Only the published snapshots, which the README shows, are kept.
+reports/*
+!reports/linkedin-post*.png
+dashboard/index.html

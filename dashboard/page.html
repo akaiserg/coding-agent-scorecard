@@ -1,0 +1,833 @@
+<style>
+#dash-root { --dash-gutter: var(--cds-pad-lg); }
+.hx { font-family: var(--font-anthropic-sans); color: var(--color-fg); max-width: 1280px; margin-inline: auto; }
+.hx-head h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); line-height: 1.2; margin: 0; text-wrap: balance; }
+.hx-take { margin: var(--cds-gap-sm) 0 0; max-width: 72ch; line-height: 1.5; }
+.hx-meta { margin: var(--cds-gap-xs) 0 0; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.hx-legend-top { display: flex; flex-wrap: wrap; gap: var(--cds-gap-md); margin-top: var(--cds-gap-sm); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.hx-sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; flex: none; }
+.hx-tabs { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs); border-bottom: 1px solid var(--color-border-line); margin: var(--cds-gap-lg) 0 var(--cds-gap-md); }
+.hx-tab { appearance: none; background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: var(--cds-pad-sm) var(--cds-pad-sm); font: inherit; color: var(--color-fg-muted); cursor: pointer; }
+.hx-tab:hover { color: var(--color-fg); }
+.hx-tab[aria-selected="true"] { color: var(--color-fg); border-bottom-color: var(--color-fg); font-weight: var(--cds-font-weight-medium); }
+.hx-tab:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; border-radius: 2px; }
+.hx-page { display: grid; gap: var(--cds-gap-lg); }
+.hx-section h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0 0 var(--cds-gap-sm); }
+.hx-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr)); gap: var(--cds-gap-md); }
+.hx-card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); min-width: 0; position: relative; }
+.hx-card h3 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; text-wrap: balance; }
+.hx-note { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin: 4px 0 var(--cds-gap-sm); line-height: 1.45; }
+.hx-legend { display: flex; flex-wrap: wrap; gap: 4px var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-bottom: var(--cds-gap-xs); }
+.hx-legend span { display: inline-flex; align-items: center; }
+.hx-chart { position: relative; min-height: 240px; }
+.hx-chart.hx-short { min-height: 170px; }
+.hx-chart svg { display: block; overflow: visible; }
+.hx-chart text { font-family: var(--font-anthropic-sans); font-size: var(--cds-font-size-caption); fill: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
+.hx-chart .hx-endlabel { fill: var(--color-fg); }
+.hx-chart .hx-inbar { fill: var(--color-bg); font-weight: var(--cds-font-weight-medium); }
+.hx-chart .domain { stroke: var(--cds-chart-axis); }
+.hx-chart .tick line { stroke: var(--cds-chart-grid); }
+.hx-failed { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: inherit; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.hx-failed::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: var(--color-bad); }
+.hx-tip { position: absolute; z-index: 5; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); min-width: 9rem; font-variant-numeric: tabular-nums; }
+.hx-tip .hx-tip-h { color: var(--cds-text-secondary); margin-bottom: 2px; }
+.hx-tip .hx-tip-r { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.hx-tip .hx-tip-r b { margin-left: auto; padding-left: var(--cds-gap-sm); font-weight: var(--cds-font-weight-medium); }
+.hx-verdicts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: var(--cds-gap-md); }
+.hx-verdict h3 { display: flex; align-items: center; gap: var(--cds-gap-sm); flex-wrap: wrap; }
+.hx-verdict p { margin: var(--cds-gap-xs) 0 0; line-height: 1.5; }
+.hx-chip { font-size: var(--cds-font-size-caption); font-weight: var(--cds-font-weight-medium); border: 1px solid var(--color-border-line); border-radius: 999px; padding: 1px 8px; display: inline-flex; align-items: center; color: var(--color-fg); }
+.hx .hx-num { font-weight: var(--cds-font-weight-medium); font-variant-numeric: tabular-nums; }
+.hx-tablebox { overflow: auto; max-height: 34rem; }
+.hx table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+.hx th, .hx td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--color-border-line); vertical-align: top; }
+.hx thead th { position: sticky; top: 0; background: var(--color-panel); font-weight: var(--cds-font-weight-medium); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); z-index: 1; }
+.hx-score td { text-align: right; white-space: nowrap; }
+.hx-score thead th:not(:first-child) { text-align: right; }
+.hx-score tbody th { font-weight: 400; }
+.hx-score .hx-group th { padding-top: var(--cds-pad-md); font-weight: var(--cds-font-weight-medium); color: var(--color-fg); border-bottom-color: var(--color-fg-muted); }
+.hx-score td.hx-best { font-weight: var(--cds-font-weight-medium); }
+.hx-score td.hx-best::before { content: "best"; font-size: var(--cds-font-size-caption); font-weight: 400; color: var(--color-ok); margin-right: 8px; }
+.hx-repocell { display: inline-flex; align-items: center; white-space: nowrap; }
+.hx-dim { color: var(--color-fg-muted); }
+.hx-filter { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs); margin-bottom: var(--cds-gap-sm); }
+.hx-filter button { font: inherit; font-size: var(--cds-font-size-caption); border: 1px solid var(--color-border-line); background: none; color: var(--color-fg-muted); border-radius: 999px; padding: 2px 10px; cursor: pointer; }
+.hx-filter button[aria-pressed="true"] { color: var(--color-fg); border-color: var(--color-fg); }
+.hx-filter button:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+.hx-method { max-width: 78ch; line-height: 1.55; }
+.hx-method h3 { margin-top: var(--cds-gap-md); }
+.hx-method li { margin-bottom: 6px; }
+.hx-method code { font-size: .92em; }
+[data-dash-source-state=empty] { color: transparent; }
+[data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+@media (max-width: 640px) { .hx th, .hx td { padding: 6px 6px; } .hx-score td.hx-best::before { display: none; } }
+</style>
+
+<div class="hx">
+  <header class="hx-head" id="top">
+    <h1>Claude Code, Codex and OpenCode on GitHub</h1>
+    <p class="hx-take dash-skeleton" id="takeaway"></p>
+    <p class="hx-meta">Snapshot of <span data-source="summary" data-field="snapshot" data-where="repo=claude-code" data-fmt="date">—</span>,
+      covering every issue and PR of each repository, read with <code>gh</code> from the GitHub GraphQL API.
+      Each month shows what was opened or closed in it; the current month is incomplete and drawn dashed.</p>
+    <div class="hx-legend-top" id="legend-top" aria-label="Repository colors"></div>
+  </header>
+
+  <nav class="hx-tabs" role="tablist" aria-label="Sections">
+    <button class="hx-tab" role="tab" id="tab-summary" data-page="summary" aria-selected="true">Summary</button>
+    <button class="hx-tab" role="tab" id="tab-flow" data-page="flow" aria-selected="false">Issue flow</button>
+    <button class="hx-tab" role="tab" id="tab-closing" data-page="closing" aria-selected="false">Closing and speed</button>
+    <button class="hx-tab" role="tab" id="tab-bugs" data-page="bugs" aria-selected="false">Bugs and fixes</button>
+    <button class="hx-tab" role="tab" id="tab-prs" data-page="prs" aria-selected="false">PRs and releases</button>
+    <button class="hx-tab" role="tab" id="tab-usage" data-page="usage" aria-selected="false">Usage</button>
+    <button class="hx-tab" role="tab" id="tab-method" data-page="method" aria-selected="false">Method</button>
+  </nav>
+
+  <!-- ===================== SUMMARY ===================== -->
+  <section class="hx-page" id="summary" role="tabpanel" aria-labelledby="tab-summary">
+    <div class="hx-section">
+      <h2>Who leads each area</h2>
+      <div class="hx-verdicts">
+        <article class="hx-card hx-verdict" id="v-backlog" data-verdict="backlog"><h3>Backlog <span class="hx-chip">—</span></h3><p class="dash-skeleton"></p></article>
+        <article class="hx-card hx-verdict" id="v-speed" data-verdict="speed"><h3>Closing speed <span class="hx-chip">—</span></h3><p class="dash-skeleton"></p></article>
+        <article class="hx-card hx-verdict" id="v-resolution" data-verdict="resolution"><h3>Issues resolved <span class="hx-chip">—</span></h3><p class="dash-skeleton"></p></article>
+        <article class="hx-card hx-verdict" id="v-bugs" data-verdict="bugs"><h3>Bug fixing <span class="hx-chip">—</span></h3><p class="dash-skeleton"></p></article>
+        <article class="hx-card hx-verdict" id="v-fixes" data-verdict="fixes"><h3>Fix cadence <span class="hx-chip">—</span></h3><p class="dash-skeleton"></p></article>
+        <article class="hx-card hx-verdict" id="v-community" data-verdict="community"><h3>Outside contributions <span class="hx-chip">—</span></h3><p class="dash-skeleton"></p></article>
+      </div>
+    </div>
+
+    <div class="hx-card" id="scorecard">
+      <h3>Scorecard</h3>
+      <p class="hx-note">"best" marks the most favorable value where the metric has a clear direction. * Claude Code: CHANGELOG "Fixed" entries; Codex and OpenCode: merged PRs titled "fix".</p>
+      <div class="hx-tablebox" style="max-height:none">
+        <table class="hx-score">
+          <thead><tr><th scope="col">Metric</th>
+            <th scope="col"><span class="hx-repocell"><span class="hx-sw" data-repo="claude-code"></span>Claude Code</span></th>
+            <th scope="col"><span class="hx-repocell"><span class="hx-sw" data-repo="codex"></span>Codex</span></th>
+            <th scope="col"><span class="hx-repocell"><span class="hx-sw" data-repo="opencode"></span>OpenCode</span></th></tr></thead>
+          <tbody>
+<!--SCORECARD-->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FLOW ===================== -->
+  <section class="hx-page" id="flow" role="tabpanel" aria-labelledby="tab-flow" hidden>
+    <div class="hx-grid">
+      <div class="hx-card" id="c-opened" data-source="monthly">
+        <h3>New issues per month</h3>
+        <p class="hx-note">Every issue created in the month, including ones later closed as duplicates.</p>
+        <div class="hx-chart dash-skeleton" data-chart="opened"></div>
+      </div>
+      <div class="hx-card" id="c-closed" data-source="monthly">
+        <h3>Closed issues per month</h3>
+        <p class="hx-note">By month of closing, for any reason (completed, not planned or duplicate).</p>
+        <div class="hx-chart dash-skeleton" data-chart="closed"></div>
+      </div>
+      <div class="hx-card" id="c-backlog" data-source="monthly">
+        <h3>Open issues at each month end</h3>
+        <p class="hx-note">Created before the month ended and still not closed on that date.</p>
+        <div class="hx-chart dash-skeleton" data-chart="backlog"></div>
+      </div>
+      <div class="hx-card" id="c-net" data-source="monthly">
+        <h3>Monthly net: new minus closed</h3>
+        <p class="hx-note">Above zero the backlog grows; below zero it shrinks.</p>
+        <div class="hx-chart dash-skeleton" data-chart="net"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CLOSING ===================== -->
+  <section class="hx-page" id="closing" role="tabpanel" aria-labelledby="tab-closing" hidden>
+    <div class="hx-grid">
+      <div class="hx-card" id="c-reasons" data-source="summary">
+        <h3>Close reason, across all closed issues</h3>
+        <p class="hx-note">GitHub records a reason on close: completed, not planned (which includes inactivity closes) or duplicate.</p>
+        <div class="hx-chart hx-short dash-skeleton" data-chart="reasons"></div>
+      </div>
+      <div class="hx-card" id="c-within" data-source="summary">
+        <h3>Issues closed within 1, 7 and 30 days</h3>
+        <p class="hx-note">Share of all issues created that were closed within each window of being opened.</p>
+        <div class="hx-chart hx-short dash-skeleton" data-chart="within"></div>
+      </div>
+      <div class="hx-card" id="c-completed" data-source="monthly">
+        <h3>Closes marked completed, per month</h3>
+        <p class="hx-note">Share of each month's closes that GitHub records as completed.</p>
+        <div class="hx-chart dash-skeleton" data-chart="completed"></div>
+      </div>
+      <div class="hx-card" id="c-ttc" data-source="monthly">
+        <h3>Median days to close</h3>
+        <p class="hx-note">By month of closing. Log scale: each gridline is ten times the one below.</p>
+        <div class="hx-chart dash-skeleton" data-chart="ttc"></div>
+      </div>
+      <div class="hx-card" id="c-cohort" data-source="monthly">
+        <h3>Issues from each month still open today</h3>
+        <p class="hx-note">By month opened: of what came in that month, how much is still open.</p>
+        <div class="hx-chart dash-skeleton" data-chart="cohort"></div>
+      </div>
+      <div class="hx-card" id="c-ratio" data-source="monthly">
+        <h3>Issues closed per new issue</h3>
+        <p class="hx-note">1 means closing as fast as issues arrive.</p>
+        <div class="hx-chart dash-skeleton" data-chart="ratio"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== BUGS ===================== -->
+  <section class="hx-page" id="bugs" role="tabpanel" aria-labelledby="tab-bugs" hidden>
+    <div class="hx-grid">
+      <div class="hx-card" id="c-bugbacklog" data-source="monthly">
+        <h3>Open bugs at each month end</h3>
+        <p class="hx-note">Claude Code and Codex: <code>bug</code> label or "[BUG]" title. OpenCode does not label bugs, so they are estimated from the title.</p>
+        <div class="hx-chart dash-skeleton" data-chart="bugbacklog"></div>
+      </div>
+      <div class="hx-card" id="c-bugttc" data-source="monthly">
+        <h3>Median days to fix a bug</h3>
+        <p class="hx-note">Bugs closed as completed only, by month of closing. Log scale.</p>
+        <div class="hx-chart dash-skeleton" data-chart="bugttc"></div>
+      </div>
+      <div class="hx-card" id="c-fixes" data-source="monthly">
+        <h3>Fixes shipped per month</h3>
+        <p class="hx-note">Claude Code: CHANGELOG "Fixed" entries, dated by npm release. Codex and OpenCode: merged PRs whose title starts with "fix".</p>
+        <div class="hx-chart dash-skeleton" data-chart="fixes"></div>
+      </div>
+      <div class="hx-card" id="c-changelog" data-source="cc_changelog">
+        <h3>Claude Code CHANGELOG per month</h3>
+        <p class="hx-note">"Fixed" entries against everything else (Added, Improved, Changed and other).</p>
+        <div class="hx-chart dash-skeleton" data-chart="changelog"></div>
+      </div>
+    </div>
+    <div class="hx-card" id="c-labels">
+      <h3>Where open issues pile up</h3>
+      <p class="hx-note">Most frequent area or platform labels on open issues, leaving out triage-state labels. OpenCode barely labels its issues, so its rows cover little.</p>
+      <div class="hx-tablebox">
+        <table data-source="open_labels" data-row-key="id" id="t-labels">
+          <thead><tr><th data-field="repo">Repository</th><th data-field="label">Label</th><th data-field="open_issues" style="text-align:right">Open</th><th data-field="pct_of_open" style="text-align:right">Share of open</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PRS ===================== -->
+  <section class="hx-page" id="prs" role="tabpanel" aria-labelledby="tab-prs" hidden>
+    <div class="hx-grid">
+      <div class="hx-card" id="c-prsopened" data-source="monthly">
+        <h3>PRs opened per month</h3>
+        <p class="hx-note">Every pull request created in the month, by anyone, including bots and Codex's sync account.</p>
+        <div class="hx-chart dash-skeleton" data-chart="prsopened"></div>
+      </div>
+      <div class="hx-card" id="c-merged" data-source="monthly">
+        <h3>PRs merged per month</h3>
+        <p class="hx-note">Codex syncs its internal monorepo through the copyberry account, which authors most of its PRs.</p>
+        <div class="hx-chart dash-skeleton" data-chart="merged"></div>
+      </div>
+      <div class="hx-card" id="c-prsunmerged" data-source="monthly">
+        <h3>PRs closed without merging, per month</h3>
+        <p class="hx-note">By month of closing: pull requests turned down, abandoned or superseded.</p>
+        <div class="hx-chart dash-skeleton" data-chart="prsunmerged"></div>
+      </div>
+      <div class="hx-card" id="c-mergerate" data-source="monthly">
+        <h3>Closed PRs that were merged</h3>
+        <p class="hx-note">Of the PRs closed in each month, the share merged rather than closed without merging.</p>
+        <div class="hx-chart dash-skeleton" data-chart="mergerate"></div>
+      </div>
+      <div class="hx-card" id="c-prsopen" data-source="monthly">
+        <h3>Open PRs at each month end</h3>
+        <p class="hx-note">Pull requests created before the month ended and not yet merged or closed on that date.</p>
+        <div class="hx-chart dash-skeleton" data-chart="prsopen"></div>
+      </div>
+      <div class="hx-card" id="c-external" data-source="monthly">
+        <h3>Merged PRs from outside the team</h3>
+        <p class="hx-note">Authors who have never merged a PR and are not marked member or collaborator; bots and Codex's sync account excluded.</p>
+        <div class="hx-chart dash-skeleton" data-chart="external"></div>
+      </div>
+      <div class="hx-card" id="c-extcount" data-source="monthly">
+        <h3>Outside PRs merged per month</h3>
+        <p class="hx-note">The same definition of outside author, as a count of PRs.</p>
+        <div class="hx-chart dash-skeleton" data-chart="extcount"></div>
+      </div>
+      <div class="hx-card" id="c-releases" data-source="monthly">
+        <h3>Versions published per month</h3>
+        <p class="hx-note">Codex and OpenCode: GitHub releases, stable and pre-release (alpha, beta). Claude Code: CHANGELOG versions published to npm. One scale per repository.</p>
+        <div class="hx-chart dash-skeleton" data-chart="releases"></div>
+      </div>
+    </div>
+    <div class="hx-card" id="c-top">
+      <h3>Open issues with the most reactions</h3>
+      <p class="hx-note">What the community asks for most and is still open.</p>
+      <div class="hx-filter" id="top-filter" role="group" aria-label="Filter by repository"></div>
+      <div class="hx-tablebox">
+        <table data-source="top_open" data-row-key="id" id="t-top">
+          <thead><tr><th data-field="repo">Repository</th><th data-field="title">Issue</th><th data-field="reactions" style="text-align:right">Reactions</th><th data-field="comments" style="text-align:right">Comments</th><th data-field="created">Created</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== USAGE ===================== -->
+  <section class="hx-page" id="usage" role="tabpanel" aria-labelledby="tab-usage" hidden>
+    <div class="hx-card">
+      <h3>Usage and audience</h3>
+      <p class="hx-take dash-skeleton" id="usage-take"></p>
+      <p class="hx-note">Two imperfect signals. GitHub stars measure developer attention, and GitHub gives only today's total, not when each star was given. npm downloads measure installs through npm only: native installers, Homebrew and release binaries are missed, and CI pipelines count on every run. Compare each repository's trend over time with more confidence than the levels across repositories.</p>
+    </div>
+    <div class="hx-grid">
+      <div class="hx-card" id="c-npm" data-source="monthly">
+        <h3>npm downloads per day</h3>
+        <p class="hx-note">Downloads of each CLI's npm package on the median day of each month. The median ignores days npm did not report and automated download storms, such as Codex's in early May 2026.</p>
+        <div class="hx-chart dash-skeleton" data-chart="npm"></div>
+      </div>
+      <div class="hx-card" id="c-issuesper" data-source="monthly">
+        <h3>New issues per 100k npm downloads</h3>
+        <p class="hx-note">Issues opened in the month for every 100,000 downloads in it: how much feedback each unit of use generates. Log scale: each gridline is ten times the one below.</p>
+        <div class="hx-chart dash-skeleton" data-chart="issuesper"></div>
+      </div>
+    </div>
+    <div class="hx-card">
+      <h3>Relative to audience</h3>
+      <p class="hx-note">Per 1,000 GitHub stars (today's count) and per npm download. "best" marks the most favorable value where the metric has a clear direction.</p>
+      <div class="hx-tablebox" style="max-height:none">
+        <table class="hx-score">
+          <thead><tr><th scope="col">Metric</th>
+            <th scope="col"><span class="hx-repocell"><span class="hx-sw" data-repo="claude-code"></span>Claude Code</span></th>
+            <th scope="col"><span class="hx-repocell"><span class="hx-sw" data-repo="codex"></span>Codex</span></th>
+            <th scope="col"><span class="hx-repocell"><span class="hx-sw" data-repo="opencode"></span>OpenCode</span></th></tr></thead>
+          <tbody>
+<!--USAGE-->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== METHOD ===================== -->
+  <section class="hx-page" id="method" role="tabpanel" aria-labelledby="tab-method" hidden>
+    <div class="hx-card hx-method">
+      <h3>Where the data comes from</h3>
+      <ul>
+        <li>Every issue and PR of <code>anthropics/claude-code</code>, <code>openai/codex</code> and <code>anomalyco/opencode</code>, read with <code>gh</code> from the GitHub GraphQL API: number, title, created and closed dates, state, close reason, labels, author type and, for PRs, merge date, who merged it and the issues it closes.</li>
+        <li>GitHub releases of the three repositories, and Claude Code's <code>CHANGELOG.md</code> with each version's npm publish date.</li>
+        <li>Counts of open issues without comments, and the most-reacted open issues, from the GitHub search API.</li>
+      </ul>
+      <h3>How each metric is computed</h3>
+      <ul>
+        <li><b>Open at month end</b>: issues created before the month ended and not closed by then. A reopened issue counts with its latest close.</li>
+        <li><b>Days to close</b>: from creation to the latest close. Medians are taken by month of closing.</li>
+        <li><b>Close reason</b>: GitHub's <code>stateReason</code>. "Closes by automation" carry <code>stale</code> or <code>autoclose</code> (Claude Code) or <code>pending close</code> (OpenCode). Codex does not close inactive issues.</li>
+        <li><b>Bugs</b>: in Claude Code and Codex, the <code>bug</code> label or a "[BUG]"/"bug:" title. OpenCode does not label issue types, so its bugs are estimated from title wording (error, crash, fails, not working…). Checked against the labels of the other two repositories, that rule is right most of the time but not always: read it as an order of magnitude.</li>
+        <li><b>Fixes</b>: Claude Code's source is not public, so its CHANGELOG "Fixed" entries are counted. For Codex and OpenCode, merged PRs whose title starts with "fix". Codex PRs are synced from an internal repository with descriptive titles that rarely say "fix", so its count is a floor.</li>
+        <li><b>Outside contributions</b>: PRs whose author is not on the team and is not a bot or Codex's <code>copyberry</code> account. The team is everyone who has merged a PR (which needs write access) plus anyone GitHub marks as member, collaborator or owner. Many employees hide their org membership and show up as plain contributors, so the role alone overstated outside work.</li>
+        <li><b>Who can open PRs</b>: a repository setting, read on every run. Where it is "collaborators only", outsiders cannot open PRs at all, so outside contributions there come from before the change; the Outside contributions card names those repositories.</li>
+        <li><b>Open PRs and merge rate</b>: a PR is open at a date if it was created before it and not yet merged or closed. The merge rate is merged PRs over all PRs closed in the month (merged or not).</li>
+        <li><b>Usage</b>: GitHub stars are today's count, since GitHub does not list when each star was given; every run of <code>scripts/run.sh</code> records the count, so stars gained per period become measurable over time. npm downloads are the daily counts of <code>@anthropic-ai/claude-code</code>, <code>@openai/codex</code> and <code>opencode-ai</code>; each period uses its median day, which leaves out days npm reported as zero (its stats outages and the latest days) and automated download storms.</li>
+        <li><b>Versions</b>: GitHub releases for Codex and OpenCode. Claude Code publishes to npm and its GitHub releases only start in Dec 2025, so its CHANGELOG versions are counted with their npm dates.</li>
+      </ul>
+      <h3>Limits</h3>
+      <ul>
+        <li>Time to first response and who closed each issue are not measured: both need each issue's timeline.</li>
+        <li>A "completed" close is not always a code fix; it is also used when a question is answered.</li>
+        <li>Teams often hide org membership, so the share of issues opened by maintainers is a floor.</li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  const REPOS = ['claude-code', 'codex', 'opencode'];
+  const NAMES = { 'claude-code': 'Claude Code', codex: 'Codex', opencode: 'OpenCode' };
+  const repoColor = (r) => dash.colors[REPOS.indexOf(r)];
+
+  const parseMonth = d3.utcParse('%Y-%m');
+  const parseDay = d3.utcParse('%Y-%m-%d');
+  const fMonthLong = d3.utcFormat('%B %Y');
+  const fMonthTick = d3.utcFormat('%b ’%y');
+  const fDay = d3.utcFormat('%b %-d, %Y');
+
+  const FMT = {
+    int: d3.format(',.0f'),
+    dec0: d3.format(',.0f'),
+    dec1: d3.format(',.1f'),
+    pct: d3.format('.0%'),
+    pct1: d3.format('.1%'),
+    signed: (v) => (v > 0 ? '+' : v < 0 ? '−' : '') + d3.format(',.0f')(Math.abs(v)),
+    kilo: (v) => d3.format(',.1f')(v / 1000) + 'k',
+    date: (v) => fDay(parseDay(String(v).slice(0, 10))),
+    hours: (v) => (v < 48 ? d3.format(',.1f')(v) + ' h' : d3.format(',.1f')(v / 24) + ' d'),
+    compact: (v) => d3.format('.3~s')(v).replace('G', 'B'),
+    pctsigned: (v) => (v > 0 ? '+' : v < 0 ? '−' : '') + d3.format('.0%')(Math.abs(v)),
+  };
+  const fmt = (kind, v) => (v === null || v === undefined || Number.isNaN(v) ? '—' : FMT[kind](v));
+  const axisCount = (v) => (Math.abs(v) >= 1000 ? d3.format(',~f')(Math.round(v / 100) / 10) + 'k' : d3.format(',~f')(v));
+
+  // ---------- small DOM helpers ----------
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
+  const swatch = (color) => { const s = el('span', 'hx-sw'); s.style.background = color; return s; };
+  function legendInto(box, items) {
+    const lg = el('div', 'hx-legend');
+    items.forEach(([label, color]) => { const s = el('span'); s.append(swatch(color), document.createTextNode(label)); lg.append(s); });
+    box.append(lg);
+  }
+  function failed(box) { box.replaceChildren(el('div', 'hx-failed', 'Failed to load')); }
+  function measure(svg, texts) {
+    const g = svg.append('g').attr('opacity', 0);
+    const w = d3.max(texts, (t) => g.append('text').text(t).node().getComputedTextLength()) || 0;
+    g.remove();
+    return w;
+  }
+  function makeTip(box) {
+    const tip = el('div', 'hx-tip'); tip.hidden = true; box.append(tip);
+    return {
+      show(x, y, head, rows) {
+        tip.replaceChildren(el('div', 'hx-tip-h', head));
+        rows.forEach(([label, color, value]) => {
+          const r = el('div', 'hx-tip-r');
+          if (color) r.append(swatch(color));
+          r.append(document.createTextNode(label), el('b', null, value));
+          tip.append(r);
+        });
+        tip.hidden = false;
+        const bw = box.clientWidth, tw = tip.offsetWidth, th = tip.offsetHeight;
+        let left = x + 14; if (left + tw > bw) left = x - tw - 14; if (left < 0) left = Math.max(0, bw - tw);
+        tip.style.left = left + 'px';
+        tip.style.top = Math.max(0, Math.min(y - th / 2, box.clientHeight - th)) + 'px';
+      },
+      hide() { tip.hidden = true; },
+    };
+  }
+  function monthTicks(x, width) {
+    const [a, b] = x.domain();
+    const months = d3.utcMonth.count(a, b) + 1;
+    const fit = Math.max(2, Math.floor(width / 64));
+    const step = [1, 2, 3, 4, 6, 12].find((s) => months / s <= fit) || 12;
+    return d3.utcMonth.range(a, d3.utcMonth.offset(b, 1)).filter((d) => d.getUTCMonth() % step === 0);
+  }
+
+  // ---------- line chart, one line per repo ----------
+  function drawLines(box, rows, o) {
+    box.replaceChildren();
+    const series = REPOS.map((repo) => ({
+      repo,
+      pts: rows.filter((r) => r.repo === repo && r[o.field] !== null && r[o.field] !== undefined && (!o.from || r.month >= o.from) && (!o.log || r[o.field] > 0))
+        .map((r) => ({ date: parseMonth(r.month), v: +r[o.field], partial: !!r.partial })),
+    })).filter((s) => s.pts.length);
+    legendInto(box, series.map((s) => [NAMES[s.repo], repoColor(s.repo)]));
+    const W = Math.max(260, box.clientWidth), H = o.height || 230;
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', box.closest('.hx-card').querySelector('h3').textContent);
+    const all = series.flatMap((s) => s.pts);
+    const yf = o.yFormat || axisCount;
+    let y;
+    const mt = 8, mb = 24;
+    if (o.log) {
+      y = d3.scaleLog([o.logMin ? Math.max(o.logMin, d3.min(all, (d) => d.v)) : d3.min(all, (d) => d.v), d3.max(all, (d) => d.v)], [H - mb, mt]).nice();
+    } else {
+      const lo = Math.min(0, d3.min(all, (d) => d.v)), hi = Math.max(o.ref ?? 0, d3.max(all, (d) => d.v));
+      y = d3.scaleLinear([lo, hi], [H - mb, mt]).nice(5);
+    }
+    const yTicks = o.log ? y.ticks().filter((t) => Math.log10(t) % 1 === 0) : y.ticks(5);
+    const ml = measure(svg, yTicks.map(yf)) + 10;
+    const lastLabels = series.map((s) => (o.endFormat || o.valueFormat)(s.pts[s.pts.length - 1].v));
+    const mr = measure(svg, lastLabels) + 12;
+    const x = d3.scaleUtc(d3.extent(all, (d) => d.date), [ml, W - mr]);
+
+    const gy = svg.append('g').attr('transform', `translate(${ml},0)`).call(d3.axisLeft(y).tickValues(yTicks).tickFormat(yf).tickSize(-(W - ml - mr)).tickPadding(6));
+    gy.attr('font-size', null).attr('font-family', null); gy.select('.domain').remove();
+    const gx = svg.append('g').attr('transform', `translate(0,${H - mb})`).call(d3.axisBottom(x).tickValues(monthTicks(x, W - ml - mr)).tickFormat(fMonthTick).tickSize(4).tickPadding(4));
+    gx.attr('font-size', null).attr('font-family', null);
+    if (o.ref !== undefined && o.ref !== null) {
+      svg.append('line').attr('x1', ml).attr('x2', W - mr).attr('y1', y(o.ref)).attr('y2', y(o.ref)).attr('stroke', 'var(--cds-chart-reference)').attr('stroke-dasharray', '4 3');
+    }
+    const line = d3.line().x((d) => x(d.date)).y((d) => y(d.v));
+    series.forEach((s) => {
+      const full = s.pts.filter((p) => !p.partial);
+      const g = svg.append('g').attr('fill', 'none').attr('stroke', repoColor(s.repo)).attr('stroke-width', 2).attr('stroke-linecap', 'round').attr('stroke-linejoin', 'round');
+      g.append('path').attr('d', line(full));
+      const p = s.pts[s.pts.length - 1];
+      if (p.partial && full.length) g.append('path').attr('d', line([full[full.length - 1], p])).attr('stroke-dasharray', '3 4');
+    });
+    // end labels, nudged apart
+    const ends = series.map((s, i) => ({ s, y: y(s.pts[s.pts.length - 1].v), x: x(s.pts[s.pts.length - 1].date), label: lastLabels[i] })).sort((a, b) => a.y - b.y);
+    for (let i = 1; i < ends.length; i++) if (ends[i].y - ends[i - 1].y < 14) ends[i].y = ends[i - 1].y + 14;
+    const over = ends.length ? ends[ends.length - 1].y - (H - mb) : 0;
+    if (over > 0) ends.forEach((e) => (e.y -= over));
+    ends.forEach((e) => {
+      svg.append('circle').attr('cx', e.x).attr('cy', y(e.s.pts[e.s.pts.length - 1].v)).attr('r', 3).attr('fill', repoColor(e.s.repo));
+      svg.append('text').attr('class', 'hx-endlabel').attr('x', W - mr + 8).attr('y', e.y).attr('dy', '0.32em').text(e.label);
+    });
+    // hover
+    const tip = makeTip(box);
+    const rule = svg.append('line').attr('y1', mt).attr('y2', H - mb).attr('stroke', 'var(--cds-chart-axis)').attr('opacity', 0);
+    const dots = svg.append('g');
+    svg.append('rect').attr('x', ml).attr('y', 0).attr('width', W - ml - mr).attr('height', H).attr('fill', 'transparent')
+      .on('pointermove', (ev) => {
+        const [px] = d3.pointer(ev);
+        const m = d3.utcMonth.round(x.invert(px));
+        const hits = series.map((s) => [s, s.pts.find((p) => +p.date === +m)]).filter(([, p]) => p);
+        if (!hits.length) return;
+        const cx = x(m);
+        rule.attr('x1', cx).attr('x2', cx).attr('opacity', 1);
+        dots.selectAll('circle').data(hits).join('circle').attr('cx', cx).attr('cy', ([, p]) => y(p.v)).attr('r', 4).attr('fill', ([s]) => repoColor(s.repo)).attr('stroke', 'var(--color-panel)').attr('stroke-width', 2);
+        const scale = box.clientWidth / W;
+        tip.show(cx * scale, d3.mean(hits, ([, p]) => y(p.v)) * scale + box.querySelector('.hx-legend').offsetHeight,
+          fMonthLong(m) + (hits.some(([, p]) => p.partial) ? ' (partial)' : ''),
+          hits.sort((a, b) => b[1].v - a[1].v).map(([s, p]) => [NAMES[s.repo], repoColor(s.repo), o.valueFormat(p.v)]));
+      })
+      .on('pointerleave', () => { tip.hide(); rule.attr('opacity', 0); dots.selectAll('*').remove(); });
+  }
+
+  // ---------- horizontal 100% bars: close reasons per repo ----------
+  function drawReasons(box, rows) {
+    box.replaceChildren();
+    const parts = [['closed_completed', 'Completed', dash.colors[3]], ['closed_not_planned', 'Not planned', dash.colors[4]], ['closed_duplicate', 'Duplicate', dash.colors[5]]];
+    legendInto(box, parts.map(([, l, c]) => [l, c]));
+    const W = Math.max(260, box.clientWidth), bh = 26, gap = 14, H = REPOS.length * (bh + gap);
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', 'Close reason by repository');
+    const ml = measure(svg, REPOS.map((r) => NAMES[r])) + 12;
+    const x = d3.scaleLinear([0, 1], [ml, W]);
+    const tip = makeTip(box);
+    REPOS.forEach((repo, i) => {
+      const r = rows.find((d) => d.repo === repo); if (!r) return;
+      const total = d3.sum(parts, ([f]) => r[f]);
+      const yy = i * (bh + gap) + 4;
+      svg.append('text').attr('x', 0).attr('y', yy + bh / 2).attr('dy', '0.32em').attr('class', 'hx-endlabel').text(NAMES[repo]);
+      let acc = 0;
+      parts.forEach(([f, label, color]) => {
+        const share = r[f] / total, x0 = x(acc), w = Math.max(0, x(acc + share) - x0 - 2);
+        svg.append('rect').attr('x', x0).attr('y', yy).attr('width', w).attr('height', bh).attr('rx', 4).attr('fill', color)
+          .on('pointermove', (ev) => { const [px, py] = d3.pointer(ev, box); tip.show(px, py, NAMES[repo], [[label, color, fmt('pct', share) + ' · ' + fmt('int', r[f])]]); })
+          .on('pointerleave', () => tip.hide());
+        if (w > 40) svg.append('text').attr('class', 'hx-inbar').attr('x', x0 + 8).attr('y', yy + bh / 2).attr('dy', '0.32em').attr('pointer-events', 'none').text(fmt('pct', share));
+        acc += share;
+      });
+    });
+  }
+
+  // ---------- grouped bars: closed within 1/7/30 days ----------
+  function drawWithin(box, rows) {
+    box.replaceChildren();
+    legendInto(box, REPOS.map((r) => [NAMES[r], repoColor(r)]));
+    const buckets = [['pct_closed_within_1d', '1 day'], ['pct_closed_within_7d', '7 days'], ['pct_closed_within_30d', '30 days']];
+    const W = Math.max(260, box.clientWidth), H = 170, mb = 22, mt = 16;
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', 'Issues closed within each window');
+    const yTicks = [0, 0.25, 0.5, 0.75, 1];
+    const ml = measure(svg, yTicks.map(FMT.pct)) + 10;
+    const x0 = d3.scaleBand(buckets.map((b) => b[0]), [ml, W]).paddingInner(0.25).paddingOuter(0.1);
+    const x1 = d3.scaleBand(REPOS, [0, x0.bandwidth()]).padding(0.12);
+    const y = d3.scaleLinear([0, 1], [H - mb, mt]);
+    const gy = svg.append('g').attr('transform', `translate(${ml},0)`).call(d3.axisLeft(y).tickValues(yTicks).tickFormat(FMT.pct).tickSize(-(W - ml)).tickPadding(6));
+    gy.attr('font-size', null).attr('font-family', null); gy.select('.domain').remove();
+    const gx = svg.append('g').attr('transform', `translate(0,${H - mb})`).call(d3.axisBottom(x0).tickFormat((k) => buckets.find((b) => b[0] === k)[1]).tickSize(0).tickPadding(8));
+    gx.attr('font-size', null).attr('font-family', null);
+    const tip = makeTip(box);
+    buckets.forEach(([f, label]) => REPOS.forEach((repo) => {
+      const r = rows.find((d) => d.repo === repo); if (!r) return;
+      const bw = Math.min(32, x1.bandwidth()), bx = x0(f) + x1(repo) + (x1.bandwidth() - bw) / 2;
+      svg.append('rect').attr('x', bx).attr('y', y(r[f])).attr('width', bw).attr('height', Math.max(0, y(0) - y(r[f]))).attr('rx', 4).attr('fill', repoColor(repo))
+        .on('pointermove', (ev) => { const [px, py] = d3.pointer(ev, box); tip.show(px, py, 'Closed within ' + label, [[NAMES[repo], repoColor(repo), fmt('pct', r[f])]]); })
+        .on('pointerleave', () => tip.hide());
+    }));
+  }
+
+  // ---------- stacked monthly bars: Claude Code changelog ----------
+  function drawChangelog(box, rows) {
+    box.replaceChildren();
+    const muted = 'var(--cds-chart-muted)';
+    legendInto(box, [['Fixed', repoColor('claude-code')], ['Everything else', muted]]);
+    const data = rows.map((r) => ({ date: parseMonth(r.month), fixed: r.fixed, rest: r.added + r.improved + r.changed + r.other, versions: r.versions, partial: r.partial }));
+    const W = Math.max(260, box.clientWidth), H = 230, mb = 24, mt = 8;
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', 'CHANGELOG entries per month');
+    const y = d3.scaleLinear([0, d3.max(data, (d) => d.fixed + d.rest)], [H - mb, mt]).nice(5);
+    const ml = measure(svg, y.ticks(5).map(axisCount)) + 10;
+    const x = d3.scaleBand(data.map((d) => +d.date), [ml, W]).padding(0.2);
+    const gy = svg.append('g').attr('transform', `translate(${ml},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(axisCount).tickSize(-(W - ml)).tickPadding(6));
+    gy.attr('font-size', null).attr('font-family', null); gy.select('.domain').remove();
+    const ticks = monthTicks(d3.scaleUtc(d3.extent(data, (d) => d.date), [0, 1]), W - ml).map((d) => +d);
+    const gx = svg.append('g').attr('transform', `translate(0,${H - mb})`).call(d3.axisBottom(x).tickValues(ticks.filter((t) => x(t) !== undefined)).tickFormat((t) => fMonthTick(new Date(t))).tickSize(4).tickPadding(4));
+    gx.attr('font-size', null).attr('font-family', null);
+    const tip = makeTip(box);
+    data.forEach((d) => {
+      const bx = x(+d.date), bw = x.bandwidth();
+      const g = svg.append('g').attr('opacity', d.partial ? 0.55 : 1);
+      g.append('rect').attr('x', bx).attr('y', y(d.fixed)).attr('width', bw).attr('height', Math.max(0, y(0) - y(d.fixed))).attr('fill', repoColor('claude-code')).attr('rx', 2);
+      g.append('rect').attr('x', bx).attr('y', y(d.fixed + d.rest)).attr('width', bw).attr('height', Math.max(0, y(d.fixed) - y(d.fixed + d.rest) - 2)).attr('fill', muted).attr('rx', 2);
+      svg.append('rect').attr('x', bx).attr('y', mt).attr('width', bw).attr('height', H - mb - mt).attr('fill', 'transparent')
+        .on('pointermove', (ev) => {
+          const [px, py] = d3.pointer(ev, box);
+          tip.show(px, py, fMonthLong(d.date) + (d.partial ? ' (partial)' : ''), [['Fixed', repoColor('claude-code'), fmt('int', d.fixed)], ['Other', muted, fmt('int', d.rest)], ['Versions', null, fmt('int', d.versions)]]);
+        })
+        .on('pointerleave', () => tip.hide());
+    });
+  }
+
+  // ---------- small multiples: releases per month ----------
+  function drawReleases(box, rows) {
+    box.replaceChildren();
+    legendInto(box, [['Stable (repository color)', 'var(--color-fg-muted)'], ['Pre-release', 'var(--cds-chart-muted)']]);
+    const W = Math.max(260, box.clientWidth), ph = 70, gap = 18;
+    const all = rows.filter((r) => r.month >= '2025-04');
+    const months = Array.from(new Set(all.map((r) => r.month))).sort();
+    const axisY = (REPOS.length - 1) * (ph + gap) + 14 + ph;
+    const H = axisY + 22;
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', 'Versions per month');
+    const ml = measure(svg, ['000']) + 10;
+    const x = d3.scaleBand(months, [ml, W]).padding(0.2);
+    const tip = makeTip(box);
+    REPOS.forEach((repo, i) => {
+      const rs = all.filter((r) => r.repo === repo);
+      const top = i * (ph + gap) + 14;
+      const y = d3.scaleLinear([0, d3.max(rs, (r) => r.versions_stable + r.versions_pre) || 1], [top + ph, top]).nice(3);
+      svg.append('text').attr('class', 'hx-endlabel').attr('x', ml).attr('y', top - 4).text(NAMES[repo]);
+      const gy = svg.append('g').attr('transform', `translate(${ml},0)`).call(d3.axisLeft(y).ticks(2).tickFormat(d3.format(',~f')).tickSize(-(W - ml)).tickPadding(6));
+      gy.attr('font-size', null).attr('font-family', null); gy.select('.domain').remove();
+      rs.forEach((r) => {
+        const bx = x(r.month), bw = x.bandwidth();
+        const g = svg.append('g').attr('opacity', r.partial ? 0.55 : 1);
+        g.append('rect').attr('x', bx).attr('y', y(r.versions_stable)).attr('width', bw).attr('height', Math.max(0, y(0) - y(r.versions_stable))).attr('fill', repoColor(repo)).attr('rx', 2);
+        g.append('rect').attr('x', bx).attr('y', y(r.versions_stable + r.versions_pre)).attr('width', bw).attr('height', Math.max(0, y(r.versions_stable) - y(r.versions_stable + r.versions_pre) - (r.versions_stable ? 2 : 0))).attr('fill', 'var(--cds-chart-muted)').attr('rx', 2);
+        svg.append('rect').attr('x', bx).attr('y', top).attr('width', bw).attr('height', ph).attr('fill', 'transparent')
+          .on('pointermove', (ev) => { const [px, py] = d3.pointer(ev, box); tip.show(px, py, NAMES[repo] + ' · ' + fMonthLong(parseMonth(r.month)) + (r.partial ? ' (partial)' : ''), [['Stable', repoColor(repo), fmt('int', r.versions_stable)], ['Pre-release', 'var(--cds-chart-muted)', fmt('int', r.versions_pre)]]); })
+          .on('pointerleave', () => tip.hide());
+      });
+    });
+    const ticks = monthTicks(d3.scaleUtc(d3.extent(months, parseMonth), [0, 1]), W - ml).map((d) => d3.utcFormat('%Y-%m')(d));
+    const gx = svg.append('g').attr('transform', `translate(0,${axisY})`).call(d3.axisBottom(x).tickValues(ticks.filter((t) => months.includes(t))).tickFormat((t) => fMonthTick(parseMonth(t))).tickSize(0).tickPadding(6));
+    gx.attr('font-size', null).attr('font-family', null); gx.select('.domain').remove();
+  }
+
+  // ---------- chart registry ----------
+  const pctAxis = FMT.pct;
+  const CHARTS = {
+    opened: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'opened', valueFormat: FMT.int }) },
+    closed: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'closed', valueFormat: FMT.int }) },
+    backlog: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'backlog_end', valueFormat: FMT.int }) },
+    net: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'net', valueFormat: FMT.signed, ref: 0 }) },
+    completed: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'pct_completed_of_closed', valueFormat: FMT.pct, yFormat: pctAxis }) },
+    ttc: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'median_ttc_days', valueFormat: (v) => FMT.dec1(v) + ' d', yFormat: (v) => d3.format(',~f')(v) + ' d', log: true, logMin: 0.01 }) },
+    cohort: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'cohort_pct_open_now', valueFormat: FMT.pct, yFormat: pctAxis }) },
+    ratio: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'close_ratio', valueFormat: FMT.dec1, yFormat: d3.format(',.1f'), ref: 1 }) },
+    bugbacklog: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'bug_backlog_end', valueFormat: FMT.int }) },
+    bugttc: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'median_bug_ttc_days', valueFormat: (v) => FMT.dec1(v) + ' d', yFormat: (v) => d3.format(',~f')(v) + ' d', log: true, logMin: 0.01 }) },
+    fixes: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'fixes', valueFormat: FMT.int, from: '2025-03' }) },
+    merged: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'prs_merged', valueFormat: FMT.int }) },
+    external: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'pct_merged_external', valueFormat: FMT.pct, yFormat: pctAxis }) },
+    extcount: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'prs_merged_external', valueFormat: FMT.int }) },
+    releases: { src: 'monthly', draw: drawReleases },
+    prsopened: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'prs_opened', valueFormat: FMT.int }) },
+    prsunmerged: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'prs_closed_unmerged', valueFormat: FMT.int }) },
+    mergerate: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'pct_prs_merged', valueFormat: FMT.pct, yFormat: pctAxis }) },
+    prsopen: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'prs_open_end', valueFormat: FMT.int }) },
+    npm: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'npm_daily', valueFormat: FMT.compact, yFormat: (v) => d3.format('~s')(v), from: '2025-06' }) },
+    issuesper: { src: 'monthly', draw: (b, d) => drawLines(b, d, { field: 'issues_per_100k_downloads', valueFormat: FMT.dec1, yFormat: (v) => d3.format(',~f')(v), log: true, logMin: 1, from: '2025-06' }) },
+    reasons: { src: 'summary', draw: drawReasons },
+    within: { src: 'summary', draw: drawWithin },
+    changelog: { src: 'cc_changelog', draw: drawChangelog },
+  };
+
+  // ---------- data-written narrative: who leads is decided by the numbers, not the page ----------
+  const mark = (field, repo, kind) => {
+    const s = el('span', 'hx-num', '—');
+    Object.assign(s.dataset, { source: 'summary', field, where: 'repo=' + repo, fmt: kind });
+    return s;
+  };
+  const VERDICTS = {
+    backlog: { field: 'pct_open', better: 'low', fmt: 'pct', label: 'Share of all issues received that is still open', extras: [['issues_open', 'int', 'open'], ['last90_net', 'signed', 'net in the last 90 days']] },
+    speed: { field: 'pct_closed_within_7d', better: 'high', fmt: 'pct', label: 'Issues closed within a week of being opened', extras: [['median_ttc_completed_days', 'dec1', 'median days to a completed close']] },
+    resolution: { field: 'pct_issues_completed', better: 'high', fmt: 'pct', label: 'Issues closed as completed, out of all received', extras: [['pct_completed_of_closed', 'pct', 'of closes completed']] },
+    bugs: { field: 'bugs_pct_completed', better: 'high', fmt: 'pct', label: 'Bug reports closed as completed', extras: [['bugs_open', 'int', 'bugs open']] },
+    fixes: { field: 'fixes_last3m_per_month', better: 'high', fmt: 'dec0', label: 'Fixes shipped per month over the last 3 full months', extras: [], note: 'Sources differ: CHANGELOG "Fixed" entries for Claude Code, merged PRs titled "fix" for the others, which is a floor for Codex.' },
+    community: { field: 'pct_merged_prs_external', better: 'high', fmt: 'pct', label: 'Merged PRs from outside the team', extras: [['prs_external_merged', 'int', 'outside PRs merged']] },
+  };
+  function ranked(rows, field, better) {
+    return rows.filter((r) => r[field] !== null && r[field] !== undefined).sort((a, b) => (better === 'low' ? a[field] - b[field] : b[field] - a[field]));
+  }
+  function writeVerdicts(rows) {
+    document.querySelectorAll('[data-verdict]').forEach((card) => {
+      const v = VERDICTS[card.dataset.verdict];
+      const chip = card.querySelector('.hx-chip');
+      const p = card.querySelector('p');
+      if (!rows) { chip.textContent = '—'; p.replaceChildren(); p.classList.add('dash-skeleton'); return; }
+      p.classList.remove('dash-skeleton');
+      const order = ranked(rows, v.field, v.better);
+      chip.textContent = order.length ? NAMES[order[0].repo] : '—';
+      const parts = [document.createTextNode(v.label + ': ')];
+      order.forEach((r, i) => {
+        if (i) parts.push(document.createTextNode(i === order.length - 1 ? '; and ' : '; '));
+        const who = el('b', null, NAMES[r.repo] + ' ');
+        parts.push(who, mark(v.field, r.repo, v.fmt));
+        if (v.extras.length) {
+          parts.push(document.createTextNode(' ('));
+          v.extras.forEach(([f, k, label], j) => { if (j) parts.push(document.createTextNode(', ')); parts.push(mark(f, r.repo, k), document.createTextNode(' ' + label)); });
+          parts.push(document.createTextNode(')'));
+        }
+      });
+      parts.push(document.createTextNode('.'));
+      if (v.note) parts.push(document.createTextNode(' ' + v.note));
+      if (card.dataset.verdict === 'community') {
+        const closed = rows.filter((r) => r.pr_policy === 'collaborators_only').map((r) => NAMES[r.repo]);
+        if (closed.length) parts.push(document.createTextNode(' ' + closed.join(' and ') + (closed.length > 1 ? ' only let' : ' only lets') + ' collaborators open PRs, a repository setting.'));
+      }
+      p.replaceChildren(...parts);
+    });
+  }
+  function writeTakeaway(rows) {
+    const p = document.getElementById('takeaway');
+    if (!rows) { p.replaceChildren(); return; }
+    const byNet = ranked(rows, 'last90_net', 'low');
+    const best = byNet[0], worst = byNet[byNet.length - 1];
+    const busy = ranked(rows, 'last90_opened_per_day', 'high')[0];
+    const shrinking = rows.filter((r) => r.last90_net < 0).length;
+    const t = (s) => document.createTextNode(s);
+    const lead = shrinking === 1 ? ' is the only one shrinking its backlog' : shrinking > 1 ? ' is shrinking its backlog fastest' : ' has the slowest backlog growth';
+    const parts = [t(NAMES[best.repo] + lead + ': net '), mark('last90_net', best.repo, 'signed'), t(' issues over the last 90 days. ')];
+    parts.push(t(NAMES[busy.repo] + ' takes in the most, '), mark('last90_opened_per_day', busy.repo, 'dec1'),
+      t(' issues a day, and closes '), mark('last90_closed_per_day', busy.repo, 'dec1'), t('. '));
+    parts.push(t((worst.repo === busy.repo ? 'It' : NAMES[worst.repo]) + ' adds the most to its backlog: net '), mark('last90_net', worst.repo, 'signed'),
+      t(' in 90 days, with '), mark('issues_open', worst.repo, 'int'), t(' issues now open.'));
+    p.replaceChildren(...parts);
+  }
+
+  function writeUsage(rows) {
+    const p = document.getElementById('usage-take');
+    p.classList.toggle('dash-skeleton', !rows);
+    if (!rows) { p.replaceChildren(); return; }
+    const t = (s) => document.createTextNode(s);
+    const byNpm = ranked(rows, 'npm_daily_30d', 'high');
+    const byStars = ranked(rows, 'stars', 'high');
+    const parts = [t('npm downloads on a typical day of the last 30: ')];
+    byNpm.forEach((r, i) => {
+      if (i) parts.push(t('; '));
+      parts.push(el('b', null, NAMES[r.repo] + ' '), mark('npm_daily_30d', r.repo, 'compact'), t(' a day ('), mark('npm_change_30d', r.repo, 'pctsigned'), t(' vs the 30 days before)'));
+    });
+    parts.push(t('. Most GitHub stars: '));
+    byStars.forEach((r, i) => {
+      if (i) parts.push(t(', '));
+      parts.push(t(NAMES[r.repo] + ' '), mark('stars', r.repo, 'compact'));
+    });
+    const load = ranked(rows, 'last90_opened_per_1k_stars', 'high');
+    parts.push(t('. For every 1,000 stars, ' + NAMES[load[0].repo] + ' received '), mark('last90_opened_per_1k_stars', load[0].repo, 'dec0'),
+      t(' new issues in the last 90 days and ' + NAMES[load[load.length - 1].repo] + ' '), mark('last90_opened_per_1k_stars', load[load.length - 1].repo, 'dec0'), t('.'));
+    p.replaceChildren(...parts);
+  }
+
+  // ---------- marked text values ----------
+  function fillMarks(root) {
+    root.querySelectorAll('[data-source][data-field][data-where]').forEach((node) => {
+      // Scorecard cells take the format from their row.
+      const kind = node.dataset.fmt || node.closest('tr[data-fmt]')?.dataset.fmt;
+      if (!kind) return;
+      const res = dash.data(node.dataset.source);
+      if (res.status !== 'ok') { node.textContent = '—'; return; }
+      const conds = node.dataset.where.split('&').map((c) => c.split('=').map(decodeURIComponent));
+      const row = res.data.find((r) => conds.every(([col, val]) => String(r[col]) === val));
+      node.textContent = row ? fmt(kind, row[node.dataset.field]) : '—';
+    });
+  }
+  function rankScorecard() {
+    const res = dash.data('summary');
+    document.querySelectorAll('.hx-score tr[data-metric]').forEach((tr) => {
+      const tds = Array.from(tr.querySelectorAll('td'));
+      tds.forEach((td) => td.classList.remove('hx-best'));
+      if (res.status !== 'ok' || !tr.dataset.better) return;
+      const vals = tds.map((td) => { const r = res.data.find((d) => d.repo === td.dataset.where.split('=')[1]); return r ? r[tr.dataset.metric] : null; });
+      const ok = vals.filter((v) => v !== null && v !== undefined);
+      if (ok.length < 2) return;
+      const best = tr.dataset.better === 'high' ? d3.max(ok) : d3.min(ok);
+      tds.forEach((td, i) => { if (vals[i] === best) td.classList.add('hx-best'); });
+    });
+  }
+
+  // ---------- tables ----------
+  let topRepo = 'all';
+  function fillLabels() {
+    const res = dash.data('open_labels');
+    const tb = document.querySelector('#t-labels tbody');
+    if (res.status !== 'ok') { tb.replaceChildren(); return; }
+    tb.replaceChildren(...res.data.map((r) => {
+      const tr = el('tr'); tr.dataset.key = r.id;
+      const rc = el('td'); const span = el('span', 'hx-repocell'); span.append(swatch(repoColor(r.repo)), document.createTextNode(NAMES[r.repo])); rc.append(span);
+      const n = el('td', null, fmt('int', r.open_issues)); n.style.textAlign = 'right';
+      const p = el('td', null, fmt('pct', r.pct_of_open)); p.style.textAlign = 'right';
+      tr.append(rc, el('td', null, r.label), n, p);
+      return tr;
+    }));
+  }
+  function fillTop() {
+    const res = dash.data('top_open');
+    const tb = document.querySelector('#t-top tbody');
+    const filter = document.getElementById('top-filter');
+    if (!filter.childElementCount) {
+      [['all', 'All'], ...REPOS.map((r) => [r, NAMES[r]])].forEach(([k, label]) => {
+        const b = el('button', null, label); b.type = 'button'; b.dataset.repo = k;
+        b.addEventListener('click', () => { topRepo = k; fillTop(); });
+        filter.append(b);
+      });
+    }
+    filter.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.repo === topRepo)));
+    if (res.status !== 'ok') { tb.replaceChildren(); return; }
+    const rows = res.data.filter((r) => topRepo === 'all' || r.repo === topRepo).sort((a, b) => b.reactions - a.reactions);
+    tb.replaceChildren(...rows.map((r) => {
+      const tr = el('tr'); tr.dataset.key = r.id;
+      const rc = el('td'); const span = el('span', 'hx-repocell'); span.append(swatch(repoColor(r.repo)), document.createTextNode(NAMES[r.repo])); rc.append(span);
+      const tc = el('td'); const a = el('a', null, r.title); a.href = `https://github.com/${{ 'claude-code': 'anthropics/claude-code', codex: 'openai/codex', opencode: 'anomalyco/opencode' }[r.repo]}/issues/${r.number}`; a.target = '_blank'; a.rel = 'noopener';
+      tc.append(a, el('span', 'hx-dim', ' #' + r.number));
+      const re = el('td', null, fmt('int', r.reactions)); re.style.textAlign = 'right';
+      const co = el('td', null, fmt('int', r.comments)); co.style.textAlign = 'right';
+      tr.append(rc, tc, re, co, el('td', null, fmt('date', r.created)));
+      return tr;
+    }));
+  }
+
+  // ---------- tabs ----------
+  const tabs = Array.from(document.querySelectorAll('.hx-tab'));
+  const pages = tabs.map((t) => document.getElementById(t.dataset.page));
+  let current = 'summary';
+  function show(id, link) {
+    current = id;
+    tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.page === id)));
+    pages.forEach((p) => { p.hidden = p.id !== id; });
+    if (link) dash.setLink(id);
+    render();
+  }
+  tabs.forEach((t) => t.addEventListener('click', () => show(t.dataset.page, true)));
+  document.querySelector('.hx-tabs').addEventListener('keydown', (ev) => {
+    if (ev.key !== 'ArrowRight' && ev.key !== 'ArrowLeft') return;
+    const i = tabs.findIndex((t) => t.dataset.page === current);
+    const next = tabs[(i + (ev.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+    next.focus(); show(next.dataset.page, true);
+  });
+
+  const legendTop = document.getElementById('legend-top');
+  REPOS.forEach((r) => { const s = el('span'); s.append(swatch(repoColor(r)), document.createTextNode(NAMES[r])); legendTop.append(s); });
+  document.querySelectorAll('.hx-sw[data-repo]').forEach((s) => { s.style.background = repoColor(s.dataset.repo); });
+
+  function render() {
+    const sum = dash.data('summary');
+    const rows = sum.status === 'ok' ? sum.data : null;
+    writeTakeaway(rows);
+    writeVerdicts(rows);
+    writeUsage(rows);
+    fillMarks(document.querySelector('.hx'));
+    document.getElementById('takeaway').classList.toggle('dash-skeleton', sum.status === 'loading');
+    rankScorecard();
+    const page = document.getElementById(current);
+    page.querySelectorAll('[data-chart]').forEach((box) => {
+      const spec = CHARTS[box.dataset.chart];
+      const res = dash.data(spec.src);
+      if (res.status === 'ok') { box.classList.remove('dash-skeleton'); spec.draw(box, res.data); }
+      else if (res.status === 'loading') { box.replaceChildren(); box.classList.add('dash-skeleton'); }
+      else { box.classList.remove('dash-skeleton'); failed(box); }
+    });
+    if (current === 'bugs') fillLabels();
+    if (current === 'prs') fillTop();
+  }
+
+  const named = location.hash.slice(1);
+  if (pages.some((p) => p.id === named)) show(named, false);
+  dash.onData(render);
+})();
+</script>
