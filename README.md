@@ -12,7 +12,7 @@ It also measures the agents at work elsewhere: pull requests signed by each agen
 
 ## Snapshot: 27 Oct 2026, last 30 days
 
-<img src="reports/linkedin-post-codex-vs-opencode_2026-10-27.png" width="480" alt="Codex vs OpenCode: issues closed for every 100 new ones, open issues day by day, and how the backlog changed">
+<img src="reports/linkedin-post-codex-vs-opencode_2026-10-27.png" width="480" alt="Codex vs OpenCode: GitHub stars, issues closed for every 100 new ones, and open issues day by day">
 
 | | Claude Code | Codex | OpenCode |
 |---|---:|---:|---:|
@@ -52,10 +52,8 @@ Every run writes these. They are generated files and are not committed, except t
   - how big issues and PRs are.
 - **Social image** (`reports/harness-social_<date>.png`): one 1080×1350 image of the three repositories for a LinkedIn post. It has two findings, each with the chart behind it: open issues day by day over 90 days, and issues received against issues closed over the last 30 days (closes split into resolved and not resolved). Below them are GitHub stars and merged PRs.
 - **Head-to-head image** (`reports/harness-social-codex-vs-opencode_<date>.png`): Codex and OpenCode only, the two whose product source is public. It focuses on how each handles its issues:
-  - GitHub stars;
-  - issues closed for every 100 new ones, against the 100 mark where the backlog holds still;
-  - the backlog day by day;
-  - the sum behind the change (open 30 days ago + new − closed = open today).
+  - one card per repository with its GitHub stars, issues closed for every 100 new ones (100 means closing them as fast as they arrive), and how its backlog changed;
+  - the backlog of open issues day by day.
 
   Pick another pair with `social_pair.py --repos A,B`.
 - **Agent PRs across GitHub** (`reports/harness-agents_<date>.html`): which agent ships more code and fixes problems faster, from PRs that carry Claude Code's, Codex's or OpenCode's signature in any public repository. It also summarizes what benchmarks and outside studies report.
